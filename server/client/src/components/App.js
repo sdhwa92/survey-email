@@ -15,9 +15,9 @@ class App extends Component {
 
   render() {
     return (
-      <div className="container">
+      <div>
         <BrowserRouter>
-          <div>
+          <div className="container">
             <Header />
             <Switch>
               <Route path="/surveys/new" component={SurveyNew} />
