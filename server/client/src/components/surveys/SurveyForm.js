@@ -3,13 +3,8 @@ import React, { Component } from "react";
 import { reduxForm, Field } from "redux-form";
 import { Link } from "react-router-dom";
 import SurveyField from "./SurveyField";
-
-const FIELDS = [
-  { label: "Survey Title", name: "title" },
-  { label: "Subject Line", name: "subject" },
-  { label: "Email Body", name: "body" },
-  { label: "Recipient List", name: "emails" },
-];
+import validateEmails from "../../utils/validateEmails";
+import FIELDS from "./formFields";
 
 class SurveyForm extends Component {
   renderFields() {
@@ -33,7 +28,7 @@ class SurveyForm extends Component {
       <div>
         <form
           // props.handleSubmit() function is automatically provided by reduxForm()
-          onSubmit={this.props.handleSubmit((values) => console.log(values))}
+          onSubmit={this.props.handleSubmit(this.props.onSurveySubmit)}
         >
           {this.renderFields()}
           <Link to="/surveys" className="red btn-flat white-text">
@@ -52,13 +47,13 @@ class SurveyForm extends Component {
 function validate(values) {
   const errors = {};
 
-  if (!values.title) {
-    errors.title = "You must provide a title";
-  }
+  errors.recipients = validateEmails(values.recipients || "");
 
-  if (!values.subject) {
-    errors.subject = "You must provide a subject";
-  }
+  FIELDS.forEach(({ name, noValueError }) => {
+    if (!values[name]) {
+      errors[name] = noValueError ? noValueError : "You must provide a value.";
+    }
+  });
 
   // redux-form assumes form is valid if errors object is empty
   return errors;
@@ -67,4 +62,5 @@ function validate(values) {
 export default reduxForm({
   validate,
   form: "surveyForm",
+  destroyOnUnmount: false,
 })(SurveyForm);
